@@ -1,0 +1,34 @@
+#Paketti datan editoimiseen ja visualisointiin
+library(tidyverse)
+
+#Paketti datan lukemiseen
+library(jsonlite)
+
+#Luetaan aineisto sisään
+aineisto <- fromJSON("https://sampo.thl.fi/pivot/prod/fi/epirapo/covid19case/fact_epirapo_covid19case.json?column=ttr10yage-444309")
+str(aineisto)
+#puretaan kategoriat paloiksi
+label <- as.data.frame(unlist(aineisto$dataset$dimension$ttr10yage$category$label))
+index <- as.data.frame(unlist(aineisto$dataset$dimension$ttr10yage$category$index))
+
+#Nimetään palaset
+names(label)<-"label"
+names(index)<-"index"
+
+#Laitetana vielä rivinumerot sarakkeiksi, jotta nämä saadaan yhteen.
+label<-rownames_to_column(label)
+index<-rownames_to_column(index)
+
+#Yhdistetään rivinimeä käyttäen
+kategoriat <- index %>% left_join(label,by="rowname")
+
+#otetaan data
+data <- as.data.frame(unlist(aineisto$dataset$value))
+
+#Nimetään
+names(data)<-"Tapauksien lkm"
+data<-rownames_to_column(data)
+data$rowname<-as.numeric(data$rowname)
+
+#Yhdistetään muuhun aineistoon
+dataset <- kategoriat %>% left_join(data,by=c("index"="rowname"))
