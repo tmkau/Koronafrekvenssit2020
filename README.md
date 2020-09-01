@@ -1,0 +1,2 @@
+# Koronafrekvenssit2020
+Harjoittelen koronafrekvenssien taulukointia 
