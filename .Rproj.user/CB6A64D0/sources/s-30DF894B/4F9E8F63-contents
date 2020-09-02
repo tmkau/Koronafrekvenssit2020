@@ -64,41 +64,34 @@ week_vals$rowname<-as.numeric(week_vals$rowname)
 sex_vals$rowname<-as.numeric(sex_vals$rowname)
 municip_vals$rowname<-as.numeric(municip_vals$rowname)
 
-data <- as.data.frame(unlist(aineisto$dataset$value))
-
-#Nimetään
-names(data)<-"tapaus_lkm"
-data<-rownames_to_column(data)
-data$rowname<-as.numeric(data$rowname)
-
-#names(data1)<-"tapaus_lkm"
-#data1<-rownames_to_column(data1)
-#data1$rowname<-as.numeric(data1$rowname)
-
-
 #Yhdistetään muuhun aineistoon
 dataset <- kategoriat_age[-10,] %>% left_join(age_vals,by=c("index_age"="rowname"))
 dataset1 <- kategoriat_week[-c(1:4,35:54),] %>% left_join(week_vals,by=c("index_week"="rowname"))
 dataset2 <- kategoriat_sex[-3,] %>% left_join(sex_vals,by=c("index_sex"="rowname"))
 dataset3 <- kategoriat_municip[-22,] %>% left_join(municip_vals,by=c("index_municip"="rowname"))
-dataset <- kategoriat[,-4] %>% left_join(data,by=c("index"="rowname"))
-
-plot(dataset1$index_week,as.numeric(as.character(dataset1$week_vals)),col="navy",main="Weekly cases",type="l")
 
 visual_c19<-function(covid_cat){
   if(covid_cat==0){
-    plot(dataset[,2],as.numeric(as.character(dataset[,4])),main="Cases by age",type="l",col="navy",xaxt="na",xlab="Age group",ylab="Case #")
+    plot(dataset[,2],as.numeric(as.character(dataset[,4])),main="Cases by age",type="l",col="navy",xaxt="na",xlab="Age group",ylab="Cases")
     axis(side=1,at=dataset[,2],labels = as.character(dataset[,3]),las=1)
   }
   if(covid_cat==1){
-    plot(dataset1[,2],as.numeric(as.character(dataset1[,4])),main="Weekly cases",type="l",col="navy")
+    plot(dataset1[,2],as.numeric(as.character(dataset1[,4])),main="Cases by week",type="l",col="navy",xlab="Week",ylab="Cases")
   }
   if(covid_cat==2){
-    plot(dataset1[,2],as.numeric(as.character(dataset2[,4])),main="Weekly cases",type="l",col="navy")
+    plot(c(1,2),as.numeric(as.character(dataset2[,4])),main="Cases by sex",xlab="Sex",type="h",xaxt="n",ylab="cases",ylim=c(0,8000),xlim=c(0,3),lwd=5)
+    axis(side=1,at=c(1,2),labels=c("male","female"))
   }
   if(covid_cat==3){
-    plot(dataset1[,2],as.numeric(as.character(dataset3[,4])),main="Weekly cases",type="l",col="navy")
+    plot(dataset3[,2],as.numeric(as.character(dataset3[,4])),ylab="Cases",main="Cases by Municipal Hospital Districts",type="h",col="navy",xaxt="na",xlab="",ylim=c(0,max(as.numeric(as.character(dataset3[,4]))))*1.2)
+    axis(side=1,at=dataset3[,2],labels = as.character(dataset3[,3]),las=3)
+    text(x = dataset3[,2],y = as.numeric(as.character(dataset3[,4])),labels = as.character(dataset3[,4]),pos = 3)
   }
 }
 
-visual_c19(0)
+#visualize
+#0=cases by age
+#1=cases by week
+#2=cases by sex
+#3=cases by hospital district
+visual_c19(1)
